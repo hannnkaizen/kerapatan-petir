@@ -4,21 +4,12 @@ $env:PATH = "$env:PATH;C:\Program Files\GMT6\bin"
 # I. Input tanggal dan buat file tanggal sementara untuk python
 # =============================================================================
 
+# Otomatis pindah direktori ke folder tempat script ini disimpan
+Set-Location $PSScriptRoot
+
 Write-Host "Isi tanggal awal hingga akhir dengan format YYYYMMDD yang dipisah koma"
 Write-Host "(contoh: 20260203,20260209)"
 $date = Read-Host "> "
-
-# Parse the input string into a DateTime object
-$startDate = [datetime]::ParseExact($inputDate, "yyyyMMdd", $null)
-
-# Add 7 days to the start date
-$endDate = $startDate.AddDays(7)
-
-# Format both dates back to YYYYMMDD and combine them with a comma
-$output = "{0},{1}" -f $startDate.ToString("yyyyMMdd"), $endDate.ToString("yyyyMMdd")
-
-# Display the output
-Write-Host $output
 
 # 2. Tulis input tanggal
 Set-Content -Path "date_temp.csv" -Value $date
@@ -32,9 +23,12 @@ Write-Host "---------------------------------------"
 
 Write-Host "[CEK] Cek data poligon.."
 
+# Lokasi folder utama
+$SOURCE_DIR = "D:\TITIPAN_KITA\RAIHAN\Git\kerapatan-petir"
+
 # Lokasi folder (Tanpa garis miring di belakang)
-$SOURCE_DIR = "D:\TITIPAN_KITA\RAIHAN\Kerapatan_Petir\SHP_File"
-$KEC_DIR = "$SOURCE_DIR\Kecamatan"
+$SHP_DIR = "$SOURCE_DIR\SHP_File"
+$KEC_DIR = "$SHP_DIR\Kecamatan"
 
 # Ekstensi file dan namanya
 $EXTENSIONS = @(".cpg", ".dbf", ".prj", ".qmd", ".shp", ".shx")
@@ -45,7 +39,7 @@ $NAMES = @("Alor_Barat_Daya", "Alor_Barat_Laut", "Alor_Selatan", "Alor_Tengah_Ut
 $MISSING_COUNT = 0
 
 Write-Host "Checking directories:"
-Write-Host "1. `"$SOURCE_DIR`""
+Write-Host "1. `"$SHP_DIR`""
 Write-Host "2. `"$KEC_DIR`""
 Write-Host "------------------------------------------"
 
@@ -60,7 +54,7 @@ foreach ($E in $EXTENSIONS) {
 # --- Logika Cek File Lainnya (Folder Utama) ---
 foreach ($N in $NAMES) {
     foreach ($E in $EXTENSIONS) {
-        if (-Not (Test-Path "$SOURCE_DIR\$N$E")) {
+        if (-Not (Test-Path "$SHP_DIR\$N$E")) {
             Write-Host "[ MISSING ] $N$E"
             $MISSING_COUNT += 1
         } 
@@ -82,8 +76,6 @@ Write-Host "------------------------------------------"
 Write-Host "[RUNNING] Starting Python data processing..."
 & "C:\Users\stage\miniconda3\Scripts\conda.exe" run -n hannn python "Pengolahan_Awal_Petir_Script_V2.py"
 Write-Host "Pengolahan data dengan python selesai."
-& "C:\Users\stage\miniconda3\Scripts\conda.exe" run -n hannn python "Pengolahan_Awal_Petir_Script_V2.py"
-Write-Host "Pembuatan figure dengan python selesai." 
 
 Write-Host "---------------------------------------"
 Write-Host "[BERHASIL 3/7] Pengolahan dengan python berhasil.." -ForegroundColor Green
@@ -146,7 +138,7 @@ foreach ($F in $csvFiles) {
 
                 # QUOTED ARGUMENTS TO PREVENT POWERSHELL PARSING ERRORS
                 gmt basemap "-R123.8/125.2/-9.1/-7.7" "-JM9.4c" "-X1.5c" "-Y1.5c" "-B0"
-                gmt plot "$SOURCE_DIR\${A}.shp" "-G$FILL_COLOR" "-W0.4p,black" "-t30"
+                gmt plot "$SOURCE_DIR\SHP_File\${A}.shp" "-G$FILL_COLOR" "-W0.4p,black" "-t30"
 
             gmt end
 

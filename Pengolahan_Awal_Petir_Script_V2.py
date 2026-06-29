@@ -15,7 +15,7 @@ from datetime import datetime
 # =============================================================================
 # Configuration Global
 # =============================================================================
-BASE_DIR = rf"D:\TITIPAN_KITA\RAIHAN\Kerapatan_Petir"
+BASE_DIR = rf"D:\TITIPAN_KITA\RAIHAN\Git\kerapatan-petir"
 #DB3_DIR = rf"D:\TITIPAN_KITA\RAIHAN\Kerapatan_Petir\Input Example"
 DB3_DIR = rf"\\172.25.106.14\c\Data DB3"
 
